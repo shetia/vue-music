@@ -45,22 +45,36 @@ export default {
         this._play()
       }
     }, 20)
+    // 监听屏幕发生改变时
+    window.addEventListener('resize', () => {
+      if (!this.slider) {
+        return
+      }
+      this._setSliderWidth(true)
+      this.slider.refresh()
+    })
   },
   methods: {
-    _setSliderWidth() {
+    // 设置轮播图宽度
+    _setSliderWidth(isResize) {
       this.children = this.$refs.sliderGroup.children
 
       let width = 0
+      // 每张图的大小
       let sliderWidth = this.$refs.slider.clientWidth
       for (let i = 0; i < this.children.length; i++) {
         let child = this.children[i]
+        // dom.js中封装好的方法
         addClass(child, 'slider-item')
         child.style.width = sliderWidth + 'px'
+        // 包含轮播图盒子总大小
         width += sliderWidth
       }
-      if (this.loop) {
+      // 当复制有首尾两张图片时，加上两张图的宽度
+      if (this.loop && !isResize) {
         width += 2 * sliderWidth
       }
+      // 包含轮播图盒子总大小
       this.$refs.sliderGroup.style.width = width + 'px'
     },
     // 初始化轮播图
@@ -72,8 +86,7 @@ export default {
         snap: true,
         snapLoop: this.loop,
         snapThreshold: 0.3,
-        snapSpeed: 400,
-        Click: true
+        snapSpeed: 400
       })
       // 为指示灯添加效果
       this.slider.on('scrollEnd', () => {
@@ -93,6 +106,7 @@ export default {
     _initDots() {
       this.dots = new Array(this.children.length)
     },
+    // 轮播自动
     _play() {
       let pageIndex = this.currentPageIndex + 1
       if (this.loop) {
